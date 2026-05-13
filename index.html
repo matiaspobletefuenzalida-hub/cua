@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cuatro Venezolano - SEA 2026</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Quicksand:wght@500;700&display=swap');
 
@@ -57,6 +55,8 @@
             backdrop-filter: blur(10px);
             z-index: 90;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            /* Permite hacer clic "a través" del panel para girar el modelo 3D en esa zona */
+            pointer-events: none; 
         }
 
         .info-panel h2 { 
@@ -99,7 +99,23 @@
             to { width: 100%; }
         }
 
-        #canvas-container { flex-grow: 1; outline: none; }
+        /* Contenedor del Iframe de Sketchfab */
+        #canvas-container { 
+            flex-grow: 1; 
+            outline: none; 
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        #canvas-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
 
         /* Controles Inferiores */
         .footer-ui {
@@ -110,6 +126,11 @@
             flex-direction: column;
             align-items: center;
             z-index: 100;
+            pointer-events: none;
+        }
+
+        .footer-ui > * {
+            pointer-events: auto; /* Reactiva el clic solo para el botón */
         }
 
         .btn-play {
@@ -155,7 +176,6 @@
 <div id="loader">CARGANDO EXPERIENCIA...</div>
 
 <header class="header-ui">
-    <!-- Membrete Izquierdo -->
     <img src="logo2.jpg" class="header-logo" alt="Escuela Santa Eugenia" onerror="this.style.opacity='0'">
     
     <div class="header-center">
@@ -163,7 +183,6 @@
         <p>Patrimonio Cultural • SEA 2026</p>
     </div>
     
-    <!-- Membrete Derecho -->
     <img src="logo_header.png" class="header-logo" alt="SEA" onerror="this.style.opacity='0'">
 </header>
 
@@ -173,7 +192,20 @@
     <div class="progress-bar"><div class="progress-fill"></div></div>
 </div>
 
-<div id="canvas-container"></div>
+<div id="canvas-container">
+    <iframe title="Cuatro venezolano" 
+            frameborder="0" 
+            allowfullscreen 
+            mozallowfullscreen="true" 
+            webkitallowfullscreen="true" 
+            allow="autoplay; fullscreen; xr-spatial-tracking" 
+            xr-spatial-tracking 
+            execution-while-out-of-viewport 
+            execution-while-not-rendered 
+            web-share 
+            src="https://sketchfab.com/models/23b7d04639874ef08e55c7a683a89e0d/embed?autostart=1&ui_theme=dark&dnt=1"> 
+    </iframe>
+</div>
 
 <div class="footer-ui">
     <button class="btn-play" onclick="playArpeggio()">TOCAR ARPEGIO SUAVE</button>
@@ -224,127 +256,17 @@ function playArpeggio() {
     });
 }
 
-/** MOTOR 3D **/
-let scene, camera, renderer, controls, instrumentGroup;
-
-function init() {
-    const container = document.getElementById('canvas-container');
-    scene = new THREE.Scene();
-    
-    camera = new THREE.PerspectiveCamera(35, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.set(10, 5, 12);
-
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.shadowMap.enabled = true;
-    container.appendChild(renderer.domElement);
-
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.8;
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const topLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    topLight.position.set(5, 10, 5);
-    scene.add(topLight);
-
-    instrumentGroup = new THREE.Group();
-
-    const woodBody = new THREE.MeshStandardMaterial({ color: 0x633517, roughness: 0.3, metalness: 0.05 });
-    const woodTop = new THREE.MeshStandardMaterial({ color: 0xedc9a1, roughness: 0.4 });
-    const woodDark = new THREE.MeshStandardMaterial({ color: 0x3d1f0d, roughness: 0.2 });
-    const ebony = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
-
-    // GEOMETRÍA ORIGINAL RESTAURADA
-    const shape = new THREE.Shape();
-    shape.moveTo(0, 1.8);
-    shape.bezierCurveTo(1.4, 1.8, 1.4, 0.5, 0.6, 0.2);
-    shape.bezierCurveTo(1.6, -0.2, 1.6, -2.4, 0, -2.4);
-    shape.bezierCurveTo(-1.6, -2.4, -1.6, -0.2, -0.6, 0.2);
-    shape.bezierCurveTo(-1.4, 0.5, -1.4, 1.8, 0, 1.8);
-
-    const extrudeSettings = { depth: 0.7, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05 };
-    const body = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, extrudeSettings), woodBody);
-    body.rotation.x = Math.PI / 2;
-    body.castShadow = true;
-    instrumentGroup.add(body);
-
-    const topWrap = new THREE.Group();
-    topWrap.position.z = 0.71; 
-    body.add(topWrap);
-
-    topWrap.add(new THREE.Mesh(new THREE.ShapeGeometry(shape), woodTop));
-
-    const pickguardShape = new THREE.Shape();
-    pickguardShape.moveTo(0, 1.8);
-    pickguardShape.bezierCurveTo(1.4, 1.8, 1.4, 0.5, 0.5, 0.1);
-    pickguardShape.lineTo(-0.5, 0.1);
-    pickguardShape.bezierCurveTo(-1.4, 0.5, -1.4, 1.8, 0, 1.8);
-    const pickguard = new THREE.Mesh(new THREE.ShapeGeometry(pickguardShape), woodDark);
-    pickguard.position.z = 0.005;
-    topWrap.add(pickguard);
-
-    const hole = new THREE.Mesh(new THREE.CircleGeometry(0.35, 32), new THREE.MeshBasicMaterial({color: 0x000000}));
-    hole.position.set(0, 0.6, 0.01);
-    topWrap.add(hole);
-
-    const bridge = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.2, 0.1), ebony);
-    bridge.position.set(0, -1.4, 0.05);
-    topWrap.add(bridge);
-
-    const neck = new THREE.Mesh(new THREE.BoxGeometry(0.6, 3.8, 0.35), woodBody);
-    neck.position.set(0, 3.3, 0.35);
-    body.add(neck);
-
-    const fretboard = new THREE.Mesh(new THREE.BoxGeometry(0.62, 3.8, 0.06), ebony);
-    fretboard.position.z = 0.2;
-    neck.add(fretboard);
-
-    const head = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.2, 0.2), woodBody);
-    head.position.set(0, 2.3, 0.1);
-    head.rotation.x = -0.15;
-    neck.add(head);
-
-    // ETIQUETA VENEZUELA 3D
-    const labelGroup = new THREE.Group();
-    const createLetter = (x) => {
-        const m = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.4, 0.1), woodDark);
-        m.position.x = x;
-        labelGroup.add(m);
-    };
-    for(let i=-4; i<=4; i++) createLetter(i*0.3);
-    labelGroup.position.set(0, -3.2, 0);
-    body.add(labelGroup);
-
-    // CUERDAS
-    const stringMat = new THREE.MeshPhongMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 });
-    for(let i=0; i<4; i++) {
-        const x = -0.21 + (i * 0.14);
-        const curve = new THREE.LineCurve3(new THREE.Vector3(x, -1.4, 0.12), new THREE.Vector3(x, 4.8, 0.35));
-        topWrap.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 2, 0.01, 8), stringMat));
-    }
-
-    scene.add(instrumentGroup);
+/** OCULTAR PANTALLA DE CARGA AL INICIAR **/
+const iframe = document.querySelector('#canvas-container iframe');
+iframe.onload = () => {
     document.getElementById('loader').style.display = 'none';
-    animate();
-}
+};
 
-function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene, camera);
-}
+// Respaldo por si el iframe tarda demasiado en enviar el evento onload
+setTimeout(() => {
+    document.getElementById('loader').style.display = 'none';
+}, 3000);
 
-window.addEventListener('resize', () => {
-    const container = document.getElementById('canvas-container');
-    camera.aspect = container.clientWidth / container.clientHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
-});
-
-init();
 </script>
 </body>
 </html>
