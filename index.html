@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuatro Venezolano - SEA 2026</title>
+    <title>Cuatro Venezolano Interactivo - SEA 2026</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Quicksand:wght@500;700&display=swap');
 
-        :root { --gold: #d4af37; }
+        :root { 
+            --gold: #d4af37; 
+            --blue-panel: rgba(30, 50, 80, 0.75); 
+        }
 
         body {
             margin: 0;
@@ -20,148 +23,78 @@
             height: 100vh;
         }
 
-        /* Cabecera Institucional */
+        /* Cabecera */
         .header-ui {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 90px;
-            background: #ffffff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 40px;
-            box-sizing: border-box;
-            border-bottom: 4px solid var(--gold);
-            z-index: 100;
+            top: 0; left: 0; width: 100%; height: 75px;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; box-sizing: border-box;
+            border-bottom: 3px solid var(--gold); z-index: 100;
         }
 
-        .header-logo { height: 65px; width: auto; object-fit: contain; }
-        .header-center { text-align: center; color: #222; }
-        .header-center h1 { margin: 0; font-family: 'Bungee', cursive; font-size: 1.6rem; line-height: 1; color: #333; }
-        .header-center p { margin: 5px 0 0 0; font-weight: 700; color: #555; font-size: 0.75rem; letter-spacing: 1px; }
+        .header-logo { height: 50px; width: auto; }
+        .header-center h1 { margin: 0; font-family: 'Bungee', cursive; font-size: 1.3rem; color: #333; }
 
-        /* Panel de Información y Datos Curiosos */
-        .info-panel {
-            position: absolute;
-            top: 110px;
-            right: 20px;
-            width: 300px;
-            background: rgba(0, 0, 0, 0.85);
-            border-left: 4px solid var(--gold);
-            border-radius: 4px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            z-index: 90;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            /* Permite hacer clic "a través" del panel para girar el modelo 3D en esa zona */
-            pointer-events: none; 
-        }
-
-        .info-panel h2 { 
-            font-family: 'Bungee', cursive; 
-            font-size: 0.8rem; 
-            color: var(--gold); 
-            margin: 0 0 12px 0; 
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        #fact-content {
-            font-size: 0.85rem;
-            line-height: 1.6;
-            color: #efefef;
-            min-height: 100px;
-            transition: opacity 0.4s ease;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 2px;
-            background: #333;
-            margin-top: 15px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            position: absolute;
-            height: 100%;
-            background: var(--gold);
-            width: 0%;
-            animation: progressAnim 8s linear infinite;
-        }
-
-        @keyframes progressAnim {
-            from { width: 0%; }
-            to { width: 100%; }
-        }
-
-        /* Contenedor del Iframe de Sketchfab */
+        /* Contenedor del Modelo 3D */
         #canvas-container { 
-            flex-grow: 1; 
-            outline: none; 
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 10;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
         }
+        #canvas-container iframe { width: 100%; height: 100%; border: none; }
 
-        #canvas-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Controles Inferiores */
-        .footer-ui {
+        /* CONSOLA DE SONIDO (Inferior, no invasiva) */
+        .music-console {
             position: absolute;
-            bottom: 30px;
-            width: 100%;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--blue-panel);
+            backdrop-filter: blur(12px);
+            border-radius: 50px;
+            border: 2px solid var(--gold);
+            padding: 15px 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 10px;
             z-index: 100;
-            pointer-events: none;
+            pointer-events: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .footer-ui > * {
-            pointer-events: auto; /* Reactiva el clic solo para el botón */
-        }
-
-        .btn-play {
-            background: linear-gradient(135deg, #b57a3d 0%, #8b4513 100%);
-            color: white;
-            padding: 16px 40px;
-            border-radius: 40px;
+        .label-style {
             font-family: 'Bungee', cursive;
-            border: 2px solid rgba(255,255,255,0.2);
+            font-size: 0.75rem;
+            color: var(--gold);
+            letter-spacing: 2px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .string-btn {
+            width: 55px; height: 55px;
+            background: radial-gradient(circle, #222 0%, #050505 100%);
+            border-radius: 50%;
+            border: 2px solid rgba(212, 175, 55, 0.3);
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Bungee', cursive; font-size: 0.7rem; color: var(--gold);
         }
 
-        .btn-play:hover { 
-            transform: translateY(-5px) scale(1.05); 
-            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
-            border-color: var(--gold);
-        }
+        .string-btn:hover { border-color: var(--gold); transform: scale(1.1); }
+        .string-btn:active { transform: scale(0.9); background: var(--gold); color: #000; }
 
-        .hint { 
-            margin-top: 12px;
-            font-size: 0.65rem; 
-            color: #aaa; 
-            text-transform: uppercase; 
-            letter-spacing: 3px; 
-            background: rgba(0,0,0,0.3);
-            padding: 4px 12px;
-            border-radius: 10px;
+        .chord-btn {
+            background: linear-gradient(135deg, #4a331a 0%, #2a1a0a 100%);
+            border-radius: 12px;
+            width: auto;
+            padding: 0 15px;
+            height: 40px;
         }
 
         #loader {
@@ -173,100 +106,95 @@
 </head>
 <body>
 
-<div id="loader">CARGANDO EXPERIENCIA...</div>
+<div id="loader">CARGANDO SONIDO VIRTUAL...</div>
 
 <header class="header-ui">
-    <img src="logo2.jpg" class="header-logo" alt="Escuela Santa Eugenia" onerror="this.style.opacity='0'">
-    
-    <div class="header-center">
-        <h1>CUATRO VENEZOLANO</h1>
-        <p>Patrimonio Cultural • SEA 2026</p>
-    </div>
-    
-    <img src="logo_header.png" class="header-logo" alt="SEA" onerror="this.style.opacity='0'">
+    <img src="logo2.jpg" class="header-logo" alt="Logo">
+    <div class="header-center"><h1>ACADEMIA DEL CUATRO</h1></div>
+    <img src="logo_header.png" class="header-logo" alt="SEA">
 </header>
 
-<div class="info-panel">
-    <h2><span style="font-size:1.2rem">💡</span> DATOS CURIOSOS</h2>
-    <div id="fact-content">El Cuatro es el instrumento nacional de Venezuela, descendiente de la guitarra renacentista del siglo XVI.</div>
-    <div class="progress-bar"><div class="progress-fill"></div></div>
-</div>
-
 <div id="canvas-container">
-    <iframe title="Cuatro venezolano" 
-            frameborder="0" 
-            allowfullscreen 
-            mozallowfullscreen="true" 
-            webkitallowfullscreen="true" 
-            allow="autoplay; fullscreen; xr-spatial-tracking" 
-            xr-spatial-tracking 
-            execution-while-out-of-viewport 
-            execution-while-not-rendered 
-            web-share 
-            src="https://sketchfab.com/models/23b7d04639874ef08e55c7a683a89e0d/embed?autostart=1&ui_theme=dark&dnt=1"> 
-    </iframe>
+    <iframe title="Cuatro venezolano" src="https://sketchfab.com/models/23b7d04639874ef08e55c7a683a89e0d/embed?autostart=1&ui_theme=dark&dnt=1"></iframe>
 </div>
 
-<div class="footer-ui">
-    <button class="btn-play" onclick="playArpeggio()">TOCAR ARPEGIO SUAVE</button>
-    <div class="hint">Interactúa con el Cuatro para explorarlo</div>
+<div class="music-console">
+    <div class="label-style">CUERDAS AL AIRE</div>
+    <div class="btn-group">
+        <button class="string-btn" onmousedown="playCuatroNote(440.00)">LA</button>
+        <button class="string-btn" onmousedown="playCuatroNote(293.66)">RE</button>
+        <button class="string-btn" onmousedown="playCuatroNote(369.99)">FA#</button>
+        <button class="string-btn" onmousedown="playCuatroNote(246.94)">SI</button>
+    </div>
+    
+    <div class="label-style" style="margin-top:5px">ACORDES (RASGUEO)</div>
+    <div class="btn-group">
+        <button class="string-btn chord-btn" onmousedown="playChord('D')">RE M</button>
+        <button class="string-btn chord-btn" onmousedown="playChord('A7')">LA 7</button>
+        <button class="string-btn chord-btn" onmousedown="playChord('G')">SOL M</button>
+    </div>
 </div>
 
 <script>
-/** DATOS DEL INSTRUMENTO **/
-const infoFacts = [
-    "Afinación: A diferencia de otros instrumentos, la cuerda superior (La) es más aguda que la segunda (Re).",
-    "El Golpeador: Esa madera oscura en la parte superior protege la tapa de los rasgueos percusivos constantes.",
-    "Madera de Concierto: Los mejores cuatros usan Cedro Amargo para el mástil y Pino Abeto para la tapa armónica.",
-    "Patrimonio: En 2013, fue declarado Bien de Interés Cultural por ser el alma de la música llanera.",
-    "El Cambur Pintón: Es la onomatopeya rítmica que define su afinación básica (La-Re-Fa#-Si).",
-    "Versatilidad: Aunque es rural en origen, hoy se usa en jazz, música clásica y pop experimental."
-];
-
-let factIdx = 0;
-function rotateFacts() {
-    const el = document.getElementById('fact-content');
-    el.style.opacity = 0;
-    setTimeout(() => {
-        factIdx = (factIdx + 1) % infoFacts.length;
-        el.innerText = infoFacts[factIdx];
-        el.style.opacity = 1;
-    }, 400);
-}
-setInterval(rotateFacts, 8000);
-
-/** AUDIO: ARPEGIO DELICADO **/
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playArpeggio() {
+
+/** * SÍNTESIS TÉCNICA: Simulamos el "pluck" de la cuerda y la madera
+ * Usamos una combinación de Triangle (cuerpo) y Sawtooth filtrado (brillo de nylon)
+ */
+function playCuatroNote(freq, delay = 0) {
     if (audioCtx.state === 'suspended') audioCtx.resume();
-    const notes = [440.00, 293.66, 369.99, 493.88]; 
-    notes.forEach((freq, i) => {
-        const startTime = audioCtx.currentTime + (i * 0.18);
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, startTime);
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.15, startTime + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 1.8);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(startTime);
-        osc.stop(startTime + 2.0);
-    });
+    
+    const now = audioCtx.currentTime + delay;
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+    
+    // Oscilador 1: El cuerpo de la nota
+    const osc1 = audioCtx.createOscillator();
+    osc1.type = 'triangle';
+    osc1.frequency.setValueAtTime(freq, now);
+
+    // Oscilador 2: El brillo metálico/nylon
+    const osc2 = audioCtx.createOscillator();
+    osc2.type = 'sawtooth';
+    osc2.frequency.setValueAtTime(freq, now);
+    const osc2Gain = audioCtx.createGain();
+    osc2Gain.gain.setValueAtTime(0.05, now); // Volumen bajo para el brillo
+
+    // Filtro para simular la madera (apaga los agudos rápido)
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(2500, now);
+    filter.frequency.exponentialRampToValueAtTime(100, now + 1.0);
+
+    // Envolvente de volumen
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.4, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+    osc1.connect(filter);
+    osc2.connect(osc2Gain);
+    osc2Gain.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 1.6);
+    osc2.stop(now + 1.6);
 }
 
-/** OCULTAR PANTALLA DE CARGA AL INICIAR **/
-const iframe = document.querySelector('#canvas-container iframe');
-iframe.onload = () => {
-    document.getElementById('loader').style.display = 'none';
+function playChord(type) {
+    const chords = {
+        'D': [293.66, 440.00, 587.33, 369.99],
+        'A7': [440.00, 277.18, 392.00, 329.63],
+        'G': [392.00, 293.66, 493.88, 392.00]
+    };
+    // El rasgueo venezolano tiene un ligero retraso entre cuerdas
+    chords[type].forEach((f, i) => playCuatroNote(f, i * 0.04));
+}
+
+window.onload = () => {
+    setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 2000);
 };
-
-// Respaldo por si el iframe tarda demasiado en enviar el evento onload
-setTimeout(() => {
-    document.getElementById('loader').style.display = 'none';
-}, 3000);
-
 </script>
 </body>
 </html>
